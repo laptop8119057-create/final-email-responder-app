@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Email Auto-Reply Viewer</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Auto-Reply Viewer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Generated Email Replies</h1>
-  
-  <!-- Add this new line -->
-  <button id="refresh-button">Refresh Emails</button>
-  
-  <div id="replies">Loading...</div>
+    <div class="container">
+        <h1>Generated Email Replies</h1>
+        <button id="refreshEmails">Refresh Emails</button>
+        
+        <!-- THIS IS THE CRITICAL FIX: THE MISSING DIV -->
+        <div id="emailList">
+            <!-- Emails will be loaded here by JavaScript -->
+        </div>
 
-  <script src="app.js"></script>
+    </div>
+    <script src="app.js"></script>
 </body>
 </html>
