@@ -1,4 +1,4 @@
-// FINAL, GUARANTEED app.js
+// FINAL PRODUCTION-READY app.js
 
 document.addEventListener('DOMContentLoaded', () => {
     // These lines are now INSIDE the DOMContentLoaded listener. This is the fix.
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emailListDiv.innerHTML = '';
             emailIds.forEach(emailId => {
                 const placeholder = document.createElement('div');
-                placeholder.className = 'email-item'; // Give it a proper class
+                placeholder.className = 'email-item';
                 placeholder.id = `placeholder-${emailId.id}`;
                 placeholder.innerHTML = `<p>Loading email...</p>`;
                 emailListDiv.appendChild(placeholder);
@@ -73,7 +73,7 @@ function createEmailHTML(email) {
         </div>
         <div class="email-body">
             <p><strong>Original Message:</strong> <span class="translate-link" style="cursor:pointer; color:blue; text-decoration:underline;">(Translate to Arabic)</span></p>
-            <pre class.original-text">${escapeHTML(email.body)}</pre>
+            <pre class="original-text">${escapeHTML(email.body)}</pre>
             <pre class="translated-text" style="display:none;"></pre>
         </div>
         <div class="email-reply">
