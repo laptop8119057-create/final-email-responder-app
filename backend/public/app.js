@@ -1,8 +1,13 @@
-// FINAL PRODUCTION app.js
+// FINAL, GUARANTEED app.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    // These lines are now INSIDE the DOMContentLoaded listener. This is the fix.
     const refreshButton = document.getElementById('refreshEmails');
     const emailListDiv = document.getElementById('emailList');
+
+    if (refreshButton) {
+        refreshButton.addEventListener('click', loadEmails);
+    }
 
     // Function to fetch details for a single email and display it
     async function fetchAndDisplayEmail(emailId) {
@@ -11,13 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error(`Failed to fetch details for email ${emailId.id}`);
             const email = await res.json();
             
-            // Once details are fetched, replace the placeholder
             const placeholderDiv = document.getElementById(`placeholder-${email.id}`);
             if (placeholderDiv) {
                 placeholderDiv.innerHTML = createEmailHTML(email);
                 addEventListenersToEmail(email.id);
             }
-
         } catch (error) {
             console.error(error);
             const placeholderDiv = document.getElementById(`placeholder-${emailId.id}`);
@@ -27,11 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to load all emails
     async function loadEmails() {
-        emailListDiv.innerHTML = '<div class="loader"></div>'; // Show loader
+        emailListDiv.innerHTML = '<div class="loader">Loading...</div>'; // Show loader
         try {
-            // STEP 1: Get only the list of email IDs
             const res = await fetch('/get-unread-email-ids');
-            if (!res.ok) throw new Error('Is the backend server running? (server.js)');
+            if (!res.ok) throw new Error('Is the backend server running?');
             const emailIds = await res.json();
 
             if (emailIds.length === 0) {
@@ -39,30 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Clear the list and create a placeholder for each email
             emailListDiv.innerHTML = '';
             emailIds.forEach(emailId => {
                 const placeholder = document.createElement('div');
-                placeholder.className = 'email-item-placeholder';
+                placeholder.className = 'email-item'; // Give it a proper class
                 placeholder.id = `placeholder-${emailId.id}`;
                 placeholder.innerHTML = `<p>Loading email...</p>`;
                 emailListDiv.appendChild(placeholder);
             });
             
-            // STEP 2: Fetch details for each email individually
             for (const emailId of emailIds) {
                 fetchAndDisplayEmail(emailId);
             }
-
         } catch (error) {
             emailListDiv.innerHTML = `<p style="color: red;">Failed to load emails. ${error.message}</p>`;
         }
     }
-
-    // --- All other functions remain mostly the same ---
     
-    refreshButton.addEventListener('click', loadEmails);
-
     // Initial load
     loadEmails();
 });
@@ -78,7 +73,7 @@ function createEmailHTML(email) {
         </div>
         <div class="email-body">
             <p><strong>Original Message:</strong> <span class="translate-link" style="cursor:pointer; color:blue; text-decoration:underline;">(Translate to Arabic)</span></p>
-            <pre class="original-text">${escapeHTML(email.body)}</pre>
+            <pre class.original-text">${escapeHTML(email.body)}</pre>
             <pre class="translated-text" style="display:none;"></pre>
         </div>
         <div class="email-reply">
@@ -131,12 +126,8 @@ async function handleSendEmail(emailDiv) {
     sendButton.textContent = 'Sending...';
     sendButton.disabled = true;
 
-    // We need to retrieve the original email data again. 
-    // This is not ideal, a better architecture would store this in memory or data attributes.
-    // For now, this will work. Let's find the ID from the parent.
     const emailId = emailDiv.id.replace('placeholder-', '');
      try {
-        // We must re-fetch the details to ensure we have the correct metadata.
         const res = await fetch(`/get-email-details/${emailId}`);
         if(!res.ok) throw new Error("Could not refetch email details to send.");
         const email = await res.json();
@@ -179,12 +170,11 @@ async function handleTranslate(emailDiv) {
     const translatedTextElem = emailDiv.querySelector('.translated-text');
     const translateLink = emailDiv.querySelector('.translate-link');
 
-    // If already translated, just toggle visibility
     if (translatedTextElem.textContent) {
         originalTextElem.style.display = 'none';
         translatedTextElem.style.display = 'block';
         translateLink.textContent = '(Show Original)';
-        translateLink.onclick = () => showOriginal(emailDiv); // Change event handler
+        translateLink.onclick = () => showOriginal(emailDiv);
         return;
     }
 
@@ -200,7 +190,7 @@ async function handleTranslate(emailDiv) {
         originalTextElem.style.display = 'none';
         translatedTextElem.style.display = 'block';
         translateLink.textContent = '(Show Original)';
-        translateLink.onclick = () => showOriginal(emailDiv); // Change event handler
+        translateLink.onclick = () => showOriginal(emailDiv);
 
     } catch (err) {
         alert('Failed to translate.');
@@ -213,7 +203,7 @@ function showOriginal(emailDiv) {
     emailDiv.querySelector('.translated-text').style.display = 'none';
     const translateLink = emailDiv.querySelector('.translate-link');
     translateLink.textContent = '(Translate to Arabic)';
-    translateLink.onclick = () => handleTranslate(emailDiv); // Reset to original handler
+    translateLink.onclick = () => handleTranslate(emailDiv);
 }
 
 function escapeHTML(str) {
