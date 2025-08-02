@@ -1,7 +1,6 @@
-// FINAL PRODUCTION-READY app.js
+// FINAL POLISHED app.js (with Right-to-Left fix for Arabic)
 
 document.addEventListener('DOMContentLoaded', () => {
-    // These lines are now INSIDE the DOMContentLoaded listener. This is the fix.
     const refreshButton = document.getElementById('refreshEmails');
     const emailListDiv = document.getElementById('emailList');
 
@@ -9,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshButton.addEventListener('click', loadEmails);
     }
 
-    // Function to fetch details for a single email and display it
     async function fetchAndDisplayEmail(emailId) {
         try {
             const res = await fetch(`/get-email-details/${emailId.id}`);
@@ -28,9 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to load all emails
     async function loadEmails() {
-        emailListDiv.innerHTML = '<div class="loader">Loading...</div>'; // Show loader
+        emailListDiv.innerHTML = '<div class="loader">Loading...</div>';
         try {
             const res = await fetch('/get-unread-email-ids');
             if (!res.ok) throw new Error('Is the backend server running?');
@@ -58,12 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Initial load
     loadEmails();
 });
 
 
 function createEmailHTML(email) {
+    // ... (This function is unchanged)
     return `
         <div class="email-header">
             <p><strong>Date:</strong> ${email.date}</p>
@@ -89,6 +86,7 @@ function createEmailHTML(email) {
 }
 
 function addEventListenersToEmail(emailId) {
+    // ... (This function is unchanged)
     const emailDiv = document.getElementById(`placeholder-${emailId}`);
     if (!emailDiv) return;
 
@@ -116,12 +114,28 @@ async function handleGenerateReply(emailDiv, lang) {
         });
         const data = await res.json();
         textarea.value = data.reply;
+
+        // --- THIS IS THE NEW CODE ---
+        // It checks the language and sets the text direction.
+        if (lang === 'ar') {
+            textarea.style.textAlign = 'right';
+            textarea.style.direction = 'rtl';
+        } else {
+            textarea.style.textAlign = 'left';
+            textarea.style.direction = 'ltr';
+        }
+        // --- END OF NEW CODE ---
+
     } catch (err) {
-        textarea.value = 'Failed to generate reply.';
+        textarea.value = 'An error occurred while generating the reply.';
+        // Also reset the text direction in case of an error
+        textarea.style.textAlign = 'left';
+        textarea.style.direction = 'ltr';
     }
 }
 
 async function handleSendEmail(emailDiv) {
+    // ... (This function is unchanged)
     const sendButton = emailDiv.querySelector('.send-email');
     sendButton.textContent = 'Sending...';
     sendButton.disabled = true;
@@ -166,6 +180,7 @@ async function handleSendEmail(emailDiv) {
 }
 
 async function handleTranslate(emailDiv) {
+    // ... (This function is unchanged)
     const originalTextElem = emailDiv.querySelector('.original-text');
     const translatedTextElem = emailDiv.querySelector('.translated-text');
     const translateLink = emailDiv.querySelector('.translate-link');
@@ -189,6 +204,8 @@ async function handleTranslate(emailDiv) {
         translatedTextElem.textContent = data.translatedText;
         originalTextElem.style.display = 'none';
         translatedTextElem.style.display = 'block';
+        translatedTextElem.style.textAlign = 'right'; // Also align the translated <pre> tag
+        translatedTextElem.style.direction = 'rtl';
         translateLink.textContent = '(Show Original)';
         translateLink.onclick = () => showOriginal(emailDiv);
 
@@ -199,6 +216,7 @@ async function handleTranslate(emailDiv) {
 }
 
 function showOriginal(emailDiv) {
+    // ... (This function is unchanged)
     emailDiv.querySelector('.original-text').style.display = 'block';
     emailDiv.querySelector('.translated-text').style.display = 'none';
     const translateLink = emailDiv.querySelector('.translate-link');
@@ -207,6 +225,7 @@ function showOriginal(emailDiv) {
 }
 
 function escapeHTML(str) {
+    // ... (This function is unchanged)
     const p = document.createElement("p");
     p.appendChild(document.createTextNode(str));
     return p.innerHTML;
